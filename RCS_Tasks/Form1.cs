@@ -13,6 +13,8 @@ namespace RCS_Tasks
     public partial class Form1 : Form
     {
         string saveFilePath;
+        bool savedOnAdding = false;
+        List<string> listOfStrings = new List<string>();
 
         public Form1()
         {
@@ -24,8 +26,22 @@ namespace RCS_Tasks
             if (tBoxInput.Text == "")
                 return;
             listView1.Items.Add(tBoxInput.Text);
+            listOfStrings.Add(tBoxInput.Text);
             tBoxInput.Text = "";
-            SaveAsToFile();
+            savedOnAdding = true;
+            SaveToFile();
+        }
+
+        private void SaveToFile()
+        {
+            if (saveFilePath != null)
+            {
+                FileIO.Write(listOfStrings, saveFilePath, savedOnAdding);
+                savedOnAdding = false;
+            }
+                
+            else
+                SaveAsToFile();
         }
 
         private void SaveAsToFile()
@@ -35,24 +51,31 @@ namespace RCS_Tasks
             saveFD.RestoreDirectory = true;
 
             if (saveFD.ShowDialog() == DialogResult.OK)
-            {
-                StringBuilder sb = new StringBuilder();
-
-                if (listView1.Items.Count > 0)
-                {
-                    // the actual data
-                    foreach (ListViewItem item in listView1.Items)
-                    {
-                        sb = new StringBuilder();
-
-                        foreach (ListViewItem.ListViewSubItem listViewSubItem in item.SubItems)
-                        {
-                            sb.Append(string.Format("{0}\t", listViewSubItem.Text));
-                        }
-                    }
-                }
-                FileIO.Write(sb, saveFD.FileName);
+            {              
+                FileIO.Write(listOfStrings, saveFD.FileName, savedOnAdding);
+                saveFilePath = saveFD.FileName;
+                savedOnAdding = false;
             }
+        }
+
+        private void BtnLoad_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFD = new OpenFileDialog();
+            openFD.Filter = "Text Files|*.txt|All Files|*.*";
+            if (openFD.ShowDialog() != DialogResult.OK)
+                return;
+
+            listOfStrings = FileIO.Read(openFD.FileName);
+
+            if (listOfStrings == null)
+                return;
+
+            listView1.Clear();
+            foreach (var str in listOfStrings)
+                listView1.Items.Add(str);
+
+            saveFilePath = openFD.FileName;
+            //lastSaved = tBoxMain.Text;
         }
     }
 }

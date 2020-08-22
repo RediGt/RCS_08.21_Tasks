@@ -10,10 +10,10 @@ namespace RCS_Tasks
 {
     class FileIO
     {
-        public static StringBuilder Read(string fileName)
+        public static List<string> Read(string fileName)
         {
             string readLine;
-            StringBuilder sb = new StringBuilder();
+            List<string> listOfStrings = new List<string>();
 
             try
             {
@@ -23,12 +23,11 @@ namespace RCS_Tasks
 
                 while (readLine != null)
                 {
-                    sb.Append(readLine);
-                    sb.AppendLine();
+                    listOfStrings.Add(readLine);
                     readLine = reader.ReadLine();
                 }
                 reader.Close();
-                return sb;
+                return listOfStrings;
             }
             catch
             {
@@ -37,14 +36,17 @@ namespace RCS_Tasks
             }
         }
 
-        public static void Write(StringBuilder sb, string fileName)
+        public static void Write(List<string> listOfStrings, string fileName, bool adding)
         {
             try
             {
                 StreamWriter sw = new StreamWriter(fileName, false);
-                sw.WriteLine(sb.ToString());
+                foreach (var str in listOfStrings)               
+                    sw.WriteLine(str);
+
                 sw.Close();
-                MessageBox.Show("Saved successfully");
+                if (!adding)
+                    MessageBox.Show("Saved successfully");
             }
             catch
             {
