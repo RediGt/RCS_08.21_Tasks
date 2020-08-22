@@ -14,6 +14,7 @@ namespace RCS_Tasks
     {
         string saveFilePath;
         bool savedOnAdding = false;
+        bool textEqualsToFile = true;
         List<string> listOfStrings = new List<string>();
 
         public Form1()
@@ -25,11 +26,16 @@ namespace RCS_Tasks
         {
             if (tBoxInput.Text == "")
                 return;
+
+            if (IfDuplicate())
+                return;
+
             listView1.Items.Add(tBoxInput.Text);
             listOfStrings.Add(tBoxInput.Text);
             tBoxInput.Text = "";
             savedOnAdding = true;
             SaveToFile();
+            tBoxInput.Focus();
         }
 
         private void SaveToFile()
@@ -75,7 +81,64 @@ namespace RCS_Tasks
                 listView1.Items.Add(str);
 
             saveFilePath = openFD.FileName;
-            //lastSaved = tBoxMain.Text;
+        }
+
+        private void btnNew_Click(object sender, EventArgs e)
+        {
+            listView1.Clear();
+            tBoxInput.Text = "";
+            saveFilePath = null;
+        }
+
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            SaveToFile();
+        }
+
+        private void btnSaveAs_Click(object sender, EventArgs e)
+        {
+            SaveAsToFile();
+        }
+
+        private void btnExit_Click(object sender, EventArgs e)
+        {
+            if (listOfStrings.Count != listView1.Items.Count)
+            
+            /*if (!lastSaved.Equals(tBoxMain.Text))
+            {
+                DialogResult res = MessageBox.Show("Wish to save changes?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                if (res == DialogResult.OK)
+                    SaveToFile();
+            }*/
+
+            this.Close();
+        }
+
+        private bool IfDuplicate()
+        {
+            bool duplicate = false;
+            foreach (var str in listOfStrings)
+            {
+                if (tBoxInput.Text == str)
+                {
+                    MessageBox.Show("Duplicate");
+                    duplicate = true;
+                    break;
+                }
+            }
+
+            return duplicate;
+        }
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            int index;
+            foreach (ListViewItem item in listView1.SelectedItems)
+            {
+                index = item.Index;
+                listView1.Items.RemoveAt(index);
+                listOfStrings.RemoveAt(index);
+            }
         }
     }
 }
