@@ -44,6 +44,7 @@ namespace RCS_Tasks
             {
                 FileIO.Write(listOfStrings, saveFilePath, savedOnAdding);
                 savedOnAdding = false;
+                textEqualsToFile = true;
             }
                 
             else
@@ -61,11 +62,15 @@ namespace RCS_Tasks
                 FileIO.Write(listOfStrings, saveFD.FileName, savedOnAdding);
                 saveFilePath = saveFD.FileName;
                 savedOnAdding = false;
+                textEqualsToFile = true;
             }
         }
 
         private void BtnLoad_Click(object sender, EventArgs e)
         {
+            if (!textEqualsToFile)
+                AskForSave();
+            
             OpenFileDialog openFD = new OpenFileDialog();
             openFD.Filter = "Text Files|*.txt|All Files|*.*";
             if (openFD.ShowDialog() != DialogResult.OK)
@@ -81,13 +86,18 @@ namespace RCS_Tasks
                 listView1.Items.Add(str);
 
             saveFilePath = openFD.FileName;
+            textEqualsToFile = true;
         }
 
         private void btnNew_Click(object sender, EventArgs e)
         {
+            if (!textEqualsToFile)
+                AskForSave();
+
             listView1.Clear();
             tBoxInput.Text = "";
             saveFilePath = null;
+            textEqualsToFile = true;
         }
 
         private void BtnSave_Click(object sender, EventArgs e)
@@ -102,14 +112,8 @@ namespace RCS_Tasks
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            if (listOfStrings.Count != listView1.Items.Count)
-            
-            /*if (!lastSaved.Equals(tBoxMain.Text))
-            {
-                DialogResult res = MessageBox.Show("Wish to save changes?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
-                if (res == DialogResult.OK)
-                    SaveToFile();
-            }*/
+            if (!textEqualsToFile)
+                AskForSave();
 
             this.Close();
         }
@@ -138,7 +142,15 @@ namespace RCS_Tasks
                 index = item.Index;
                 listView1.Items.RemoveAt(index);
                 listOfStrings.RemoveAt(index);
+                textEqualsToFile = false;
             }
+        }
+
+        private void AskForSave()
+        {
+            DialogResult res = MessageBox.Show("Wish to save changes?", "Confirmation", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+            if (res == DialogResult.OK)
+                SaveToFile();
         }
     }
 }
